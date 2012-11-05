@@ -6,3 +6,7 @@ Requires a web browser supporting WebSockets.
 See example/index.html for an example implementation.
 
 Not all packets currently implemented.
+
+Bundles a copy of
+  * jspack - http://code.google.com/p/jspack
+  * nodejs' events.EventEmitter and util.inherits - https://github.com/joyent/node/
