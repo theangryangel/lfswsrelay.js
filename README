@@ -1,0 +1,8 @@
+lfswsrelay.js
+=============
+A small set of scripts to wrap and deal with the LFSWorld websocket InSim relay.
+
+Requires a web browser supporting WebSockets.
+See example/index.html for an example implementation.
+
+Not all packets currently implemented.
