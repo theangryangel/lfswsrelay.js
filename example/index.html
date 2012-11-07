@@ -12,10 +12,10 @@
 		<script type="text/javascript" charset="utf-8" src="../lib/relay.js"></script>
 
 		<script type="text/javascript" charset="utf-8">
-		var client = new IR_Relay();
+		var client = new lfswsrelay.client();
 		client.on('connected', function()
 		{
-			var payload = new IR_HLR().pack();
+			var payload = new lfswsrelay.packets.IR_HLR().pack();
 			client.send(payload);
 		});
 
