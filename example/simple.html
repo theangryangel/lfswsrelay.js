@@ -27,7 +27,16 @@
 		<script type="text/javascript" charset="utf-8" src="../lib/relay.js"></script>
 
 		<script type="text/javascript" charset="utf-8">
+
+		// Add optional, unimplemented non-core packets:
+		// arguments: packet id, packet name, class/function that implements the packet
+		// packet class must implement .pack() and .unpack() functions
+		// inheriting from lfswsrelay.packets.IS_NONE can take care of this for
+		// you (see relay.js for an example)
+		// lfswsrelay.packets.add(255, 'IR_ERR', IR_ERR); 
+
 		var client = new lfswsrelay.client();
+
 		client.on('connected', function()
 		{
 			var payload = new lfswsrelay.packets.IR_HLR().pack();
