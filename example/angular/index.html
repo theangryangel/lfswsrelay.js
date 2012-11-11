@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en" ng-app="demo">
+	<head>
+
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="../thirdparty/css/bootstrap.min.css">
+		<link rel="stylesheet" href="../thirdparty/css/angular-ui.min.css">
+		<link rel="stylesheet" href="../thirdparty/css/select2.css">
+
+		<style type="text/css" media="all">
+			:disabled, [disabled=disabled]
+			{
+				cursor: not-allowed !important;
+			}
+
+			.select2-container
+			{
+				min-width: 300px;
+				margin-right: 5px;
+			}
+
+			body {
+				padding-top: 60px;
+				padding-bottom: 40px;
+			}
+
+			.hero-unit
+			{
+				padding-top: 60px;
+				padding-right: 60px;
+				padding-bottom: 60px;
+				padding-left: 60px;
+				margin-bottom: 30px;
+				font-size: 18px;
+				font-weight: 200;
+				line-height: 30px;
+				color: inherit;
+				background-color: #eeeeee;
+				border-top-left-radius: 6px;
+				border-top-right-radius: 6px;
+				border-bottom-right-radius: 6px;
+				border-bottom-left-radius: 6px;
+			}
+
+			.sidebar-nav {
+				padding: 9px 0;
+			}
+
+			.status-line
+			{
+				float: right;
+				padding-top: 10px;
+				padding-right: 15px;
+				padding-bottom: 10px;
+				padding-left: 15px;
+				color: #777777;
+				text-shadow: #ffffff;
+			}
+
+			.host-selection button
+			{
+				margin-bottom: 8px;
+			}
+
+			ul.wizard 
+			{
+				margin-bottom: 0;
+			}
+		</style>
+
+		<title>lfswsrelay.js :: an angular example</title>
+
+	</head>
+	<body>
+
+		<div class="navbar navbar-fixed-top">
+			<div class="navbar-inner">
+				<div class="container-fluid">
+					<div class="status-line" ng-controller="LytCtrl">
+						Status: {{ status }}
+					</div>
+
+					<a class="brand" href="/">lfswsrelay.js</a>
+
+					<ul class="breadcrumb wizard">
+						<li><a href="#/1"><span class="badge">1</span> Connect to the Relay</a></li>
+						<li><span class="divider">/</span></li>
+						<li><a href="#/2"><span class="badge">2</span> Select a Host</a></li>
+						<li><span class="divider">/</span></li>
+						<li><a href="#/3"><span class="badge">3</span> Play with that Data</a></li>
+						<li><span class="divider">/</span></li>
+						<li><a href="#/4"><span class="badge">4</span> Disconnect from the Relay</a></li>
+					</ul>
+
+				</div>
+			</div>
+		</div>
+
+
+		<div ng-view>
+			
+		</div>
+
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+
+		<script type="text/javascript" charset="utf-8" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular.min.js"></script>
+		<script type="text/javascript" charset="utf-8" src="../thirdparty/js/angular-ui.min.js"></script>
+		<script type="text/javascript" charset="utf-8" src="../thirdparty/js/select2.min.js"></script>
+
+		<script type="text/javascript" charset="utf-8" src="../../../jspack-arraybuffer/struct.js"></script>
+		<script type="text/javascript" charset="utf-8" src="../../lib/event.js"></script>
+		<script type="text/javascript" charset="utf-8" src="../../lib/relay.js"></script>
+
+		<script type="text/javascript" charset="utf-8">
+
+			var demo = angular.module('demo', [ 'ui' ])
+			.config(function($routeProvider)
+			{
+				$routeProvider
+					.when('/1', { controller: Step1Ctrl, templateUrl: 'partials/1.html' })
+					.when('/2', { controller: Step2Ctrl, templateUrl: 'partials/2.html' })
+					.when('/3', { controller: Step3Ctrl, templateUrl: 'partials/3.html' })
+					.when('/4', { controller: Step4Ctrl, templateUrl: 'partials/4.html' })
+					.otherwise({ redirectTo:'/1' });
+			})
+			.filter('stripcodes', function ()
+			{
+				// you shouldn't do this in a real world scenario - this shit needs
+				// translating properly
+				return function (text)
+				{
+					return text.replace(/\^[0-9\^LGCJETBHSK]/g, '');
+				};
+			})
+			.factory('relay', function ($rootScope)
+			{
+				var relay = new lfswsrelay.client();
+				return relay;
+			});
+
+			function LytCtrl($scope, relay)
+			{
+				$scope.status = 'Disconnected';
+
+				relay.on('IR_ERR', function(data)
+				{
+
+					$scope.$apply(function()
+					{
+						$scope.status = 'Connected (Error)';
+					});
+					console.log(data);
+				});
+
+				relay.on('connected', function()
+				{
+					$scope.$apply(function()
+					{
+						$scope.status = 'Connected';
+					});
+				});
+
+				relay.on('disconnected', function()
+				{
+					$scope.$apply(function()
+					{
+						$scope.status = 'Disconnected';
+					});
+				});
+			}
+
+			function Step1Ctrl($scope, $location, relay)
+			{
+				$scope.connect = function()
+				{
+					relay.connect();
+
+					$location.path('/2');
+				}
+			}
+
+			function Step2Ctrl($scope, relay)
+			{
+				$scope.$safe$apply = function(fn)
+				{
+					var phase = this.$root.$$phase;
+					if(phase == '$apply' || phase == '$digest')
+					{
+						fn();
+						return;
+					}
+					this.$apply(fn);
+				}
+
+				$scope.hosts = [];
+				$scope.selected = '';
+
+				relay.on('IR_HOS', function(data)
+				{
+					$scope.$safe$apply( function()
+					{
+						for (var i in data.info)
+							$scope.hosts.push(data.info[i]);
+					});
+				});
+
+				$scope.refresh = function()
+				{
+					if (!relay.isConnected())
+						return;
+
+					$scope.$safe$apply( function()
+					{
+						$scope.hosts = [];
+					});
+
+					var payload = new lfswsrelay.packets.IR_HLR().pack();
+					relay.send(payload);
+				}
+
+				$scope.clear = function()
+				{
+					if (!relay.isConnected())
+						return;
+
+					$scope.$safe$apply( function()
+					{
+						$scope.hosts = [];
+					});
+				}
+
+				$scope.select = function()
+				{
+					if (!relay.isConnected())
+					{
+						console.log('not connected');
+						return;
+					}
+
+					var selected = null;
+
+					for (var i in $scope.hosts)
+					{
+						console.log("%d - %s", i, $scope.hosts[i].hname);
+
+						if ($scope.hosts[i].hname != $scope.selected)
+							continue;
+
+						console.log('setting hname');
+						selected = $scope.hosts[i].hname;
+
+						console.log('breaking');
+						break;
+					}
+
+					console.log('sending log');
+					var pkt = new lfswsrelay.packets.IR_SEL();
+					pkt.hname = selected;
+
+					try
+					{
+						var payload = pkt.pack();
+						relay.send(payload);
+
+						console.log(new lfswsrelay.packets.IR_SEL(payload));
+						console.log(Uint8Array(payload));
+					}
+					catch (e)
+					{
+						console.log(e);
+					}
+				}
+			}
+
+			function Step3Ctrl($scope, relay)
+			{
+			}
+
+			function Step4Ctrl($scope, $location, relay)
+			{
+				$scope.disconnect = function()
+				{
+					if (!relay.isConnected())
+						return;
+
+					relay.disconnect();
+
+					$location.path('/1');
+				}
+			}
+		</script>
+	</body>
+</html>

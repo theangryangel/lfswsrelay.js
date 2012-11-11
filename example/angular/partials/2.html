@@ -1,0 +1,22 @@
+		<!-- Step 2 -->
+		<div class="hero-unit">
+			<div class="container-fluid">
+				<h2>Select a Host</h2>
+				<p>{{ selected }}</p>
+				<div>
+					<select ui-select2="{ allowClear: true }" placeholder="Select
+						a Host" ng-model="selected">
+							<option>Select a Host</option>
+							<option ng-repeat="i in hosts" value="{{i.hname}}">{{i.hname | stripcodes}}</option>
+					</select>
+
+					<div class="btn-group">
+						<button class="btn" type="button" ng-click="refresh()"><i class="icon icon-refresh"></i> Refresh Host List</button>
+						<button class="btn" type="button" ng-click="clear()"><i
+								class="icon icon-remove"></i> Refresh Host List</button>
+						<button class="btn" type="button" ng-click="select()"><i class="icon icon-play"></i> Connect to selected host</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
