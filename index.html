@@ -31,12 +31,17 @@
 		<!-- MAIN CONTENT -->
 		<div id="main_content_wrap" class="outer">
 			<section id="main_content" class="inner">
-			<h3>What is it?</h3>
-
+			<h3>Requirements &amp; Prerequisties</h3>
 			<ul>
-				<li>Live For Speed is a online racing simulator</li>
+				<li>A modern browser that supports WebSockets and ArrayBuffers</li>
+				<li><a href="https://github.com/theangryangel/jspack-arraybuffer">jspack-arraybuffer</a></li>
+			</ul>
+
+			<h3>What is it?</h3>
+			<ul>
+				<li><a href="http://www.lfs.net/">Live For Speed</a> is a online racing simulator</li>
 				<li>InSim is a protocol to communicate with LFS client and servers</li>
-				<li>LFS World is the online stats, and InSim relay service provided
+				<li><a href="http://www.lfsworld.net/">LFS World</a> is the online stats, and InSim relay service provided
 				by the Live For Speed developers</li>
 				<li>The InSim relay talks TCP and also WebSockets</li>
 				<li>lfswsrelay.js is a convenience wrapper to communicate with the
@@ -84,11 +89,15 @@ client.on('disconnected', function()
 });
 
 // connect to the relay
-client.connect();</code></pre>A full list of packets is available at the <a href="http://www.lfsforum.net/showthread.php?t=30740">LFS Forum</a>.
+client.connect();</code></pre>A full list of relay specific packets are
+				available at the <a
+					href="http://www.lfsforum.net/showthread.php?t=30740">LFS
+					Forum</a>, and a full list of InSim packets are available in
+				your LFS installs docs/insim.txt, at online at the <a href="http://en.lfsmanual.net/wiki/InSim.txt">LFS Wiki</a>.
 				</li>
 			</ol>
 
-			<h3>Want more examples?</h3>
+			<h3>Want more comprehensive examples?</h3>
 			<p>Checkout the <a href="https://github.com/theangryangel/lfswsrelay.js/tree/master/example">examples/ directory</a> of the github repository.</p>
 
 			</section>
