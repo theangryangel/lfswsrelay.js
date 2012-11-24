@@ -1,50 +1,106 @@
 <!DOCTYPE html>
 <html>
 
-  <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Slate is a responsive theme for GitHub Pages" />
+	<head>
+		<meta charset='utf-8' />
+		<meta http-equiv="X-UA-Compatible" content="chrome=1" />
+		<meta name="description" content="Slate is a responsive theme for GitHub Pages" />
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+		<link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
-    <title>Slate : A responsive theme for GitHub Pages</title>
-  </head>
+		<title>lfswsrelay.js : A WebSocket based InSim relay client for LFSWorld</title>
+	</head>
 
-  <body>
+	<body>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="repository_url}}">View on GitHub</a>
+		<!-- HEADER -->
+		<div id="header_wrap" class="outer">
+			<header class="inner">
+			<a id="forkme_banner" href="https://github.com/theangryangel/lfswsrelay.js">View on GitHub</a>
 
-          <h1 id="project_title">Slate</h1>
-          <h2 id="project_tagline">A responsive theme for GitHub Pages</h2>
+			<h1 id="project_title">lfswsrelay.js</h1>
+			<h2 id="project_tagline">A WebSocket based InSim relay client for LFSWorld</h2>
 
-          <section id="downloads">
-            <a class="zip_download_link" href="#">Download this project as a .zip file</a>
-            <a class="tar_download_link" href="#">Download this project as a tar.gz file</a>
-          </section>
-        </header>
-    </div>
+			<section id="downloads">
+			<a class="zip_download_link" href="https://github.com/theangryangel/lfswsrelay.js/archive/master.zip">Download this project as a .zip file</a>
+			<a class="tar_download_link" href="https://github.com/theangryangel/lfswsrelay.js/archive/master.tar.gz">Download this project as a tar.gz file</a>
+			</section>
+			</header>
+		</div>
 
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h3>A simple, legible layout.</h3>
-        <p>Slate is a simple theme with a focus on content legibility and code styles. Use it for your documentation or your personal site to ensure that you're looking good across a range of devices and screen sizes.</p>
+		<!-- MAIN CONTENT -->
+		<div id="main_content_wrap" class="outer">
+			<section id="main_content" class="inner">
+			<h3>What is it?</h3>
 
-        <p>Add your content here and get the ball rolling. If you want to generate your automatically page with the Slate theme, checkout <a href="http://pages.github.com">GitHub Pages</a>.</p>
-      </section>
-    </div>
+			<ul>
+				<li>Live For Speed is a online racing simulator</li>
+				<li>InSim is a protocol to communicate with LFS client and servers</li>
+				<li>LFS World is the online stats, and InSim relay service provided
+				by the Live For Speed developers</li>
+				<li>The InSim relay talks TCP and also WebSockets</li>
+				<li>lfswsrelay.js is a convenience wrapper to communicate with the
+				WebSocket implementation</li>
+			</ul>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Slate theme maintained by <a href="https://github.com/jsncostello">Jason Costello</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
+			<p>Got it?</p>
 
-  </body>
+			<h3>What's it used for?</h3>
+			<p>With a modern web browser, this allows you to display information on your website, about your Live For Speed game server(s) without any server side programming.</p>
+
+			<h3>I've got no imagination.. Can you give me an example?</h3>
+			<p>A list of current players, the current map and number of laps, a live updating map with everyone's positions.</p>
+			<p>Cool, huh?</p>
+
+			<h3>Usage</h3>
+			<ol>
+				<li>Download <a href="https://github.com/theangryangel/lfswsrelay.js/archive/master.zip">lfswsrelay.js</a></li>
+				<li>Download <a href="https://github.com/theangryangel/jspack-arraybuffer">jspack-arraybuffer</a></li>
+				<li>Include relay.js from lfswsrelay.js and struct.js from jspack-arraybuffer:
+					<pre><code>&lt;script type="text/javascript" charset="utf-8" src="struct.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" charset="utf-8" src="relay.js"&gt;&lt;/script&gt;</code></pre>
+				</li>
+				<li>Now you need to initialise the relay client and send relay &amp; insim packets according to the data you want to receive:
+					<pre><code>var client = new lfswsrelay.client();
+
+// When connected, request a list of hosts
+client.on('connected', function()
+{
+	var payload = new lfswsrelay.packets.IR_HLR().pack();
+	client.send(payload);
+});
+
+// When we receive a IR_HOS (a partial list of hosts registered with the relay)
+// log it to the console
+client.on('IR_HOS', function(data)
+{
+	console.log(data);
+});
+
+// When we get disconnected, log "disconnected" in the console
+client.on('disconnected', function()
+{
+	console.log('disconnected!');
+});
+
+// connect to the relay
+client.connect();</code></pre>A full list of packets is available at the <a href="http://www.lfsforum.net/showthread.php?t=30740">LFS Forum</a>.
+				</li>
+			</ol>
+
+			<h3>Want more examples?</h3>
+			<p>Checkout the <a href="https://github.com/theangryangel/lfswsrelay.js/tree/master/example">examples/ directory</a> of the github repository.</p>
+
+			</section>
+		</div>
+
+		<!-- FOOTER  -->
+		<div id="footer_wrap" class="outer">
+			<footer class="inner">
+			<p class="copyright">Slate theme maintained by <a href="https://github.com/jsncostello">Jason Costello</a></p>
+			<p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+			</footer>
+		</div>
+
+	</body>
 </html>
