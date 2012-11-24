@@ -3,9 +3,13 @@ lfswsrelay.js
 A small set of scripts to wrap and deal with the LFSWorld websocket InSim relay.
 
 Requires a web browser supporting WebSockets.
-See example/index.html for an example implementation.
+See examples/ for example usage.
+examples/simple/ for a basic implementation.
+examples/angular/ for a more complex angular.js based implementation.
 
 Not all packets currently implemented.
+Higher level API currently not implemented, this means that you kind of need to
+know the essentials of InSim and the Relay.
 
 Bundles a copy of
   * nodejs' events.EventEmitter and util.inherits - https://github.com/joyent/node/
