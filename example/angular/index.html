@@ -120,6 +120,7 @@
 		<script type="text/javascript" charset="utf-8" src="../../../jspack-arraybuffer/struct.js"></script>
 		<script type="text/javascript" charset="utf-8" src="../../lib/event.js"></script>
 		<script type="text/javascript" charset="utf-8" src="../../lib/relay.js"></script>
+		<script type="text/javascript" charset="utf-8" src="../../lib/insim.js"></script>
 
 		<script type="text/javascript" charset="utf-8">
 
@@ -140,6 +141,13 @@
 				return function (text)
 				{
 					return text.replace(/\^[0-9\^LGCJETBHSK]/g, '');
+				};
+			})
+			.filter('passworded', function ()
+			{
+				return function (flags)
+				{
+					return flags & 1;
 				};
 			})
 			.factory('relay', function ($rootScope)
@@ -231,6 +239,19 @@
 				$scope.hosts = [];
 				$scope.selected = '';
 
+				// dirty hax
+				$scope.formatResult = function(i)
+				{
+					var r = '';
+
+					if (/^locked:1/.test(i.text))
+						r = '<i class="icon icon-lock"></i> ';
+
+					r += i.text.replace(/^locked:[0-1]/, '');
+
+					return r;
+				};
+
 				relay.on('IR_HOS', function(data)
 				{
 					$scope.$safe$apply(function()
@@ -318,11 +339,48 @@
 
 				$scope.template = 'partials/3-host.html';
 
+				$scope.sparse = function (input)
+				{
+					return input.filter(function() { return true });
+				};
+
 				relay.on('IR_ARP', function(pkt)
 				{
 					$scope.$safe$apply(function()
 					{
 						$scope.host.admin = pkt.admin;
+					});
+				});
+
+				relay.on('IS_NCN', function(pkt)
+				{
+					$scope.$safe$apply(function()
+					{
+						$scope.conns[pkt.ucid] = pkt;
+					});
+				});
+
+				relay.on('IS_CNL', function(pkt)
+				{
+					$scope.$safe$apply(function()
+					{
+						delete $scope.conns[pkt.ucid];
+					});
+				});
+
+				relay.on('IS_NPL', function(pkt)
+				{
+					$scope.$safe$apply(function()
+					{
+						$scope.plyrs[pkt.plid] = pkt;
+					});
+				});
+
+				relay.on('IS_PLP', function(pkt)
+				{
+					$scope.$safe$apply(function()
+					{
+						delete $scope.plyrs[pkt.plid];
 					});
 				});
 
@@ -334,12 +392,18 @@
 					return;
 
 				// is admin?
-				var payload = new lfswsrelay.packets.IR_ARQ().pack();
-				relay.send(payload);
+				var adminreq = new lfswsrelay.packets.IR_ARQ().pack();
+				relay.send(adminreq);
 
 				// send TINY_NCN to get connection list
+				var ncn = new lfswsrelay.packets.IS_TINY();
+				ncn.subt = 13;
+				relay.send(ncn.pack());
 
 				// send TINY_NPL to get player list
+				var npl = new lfswsrelay.packets.IS_TINY();
+				npl.subt = 14;
+				relay.send(npl.pack());
 			}
 
 			function Step4Ctrl($scope, $location, relay)

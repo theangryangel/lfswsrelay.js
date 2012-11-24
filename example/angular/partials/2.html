@@ -2,12 +2,15 @@
 		<div class="hero-unit">
 			<div class="container-fluid">
 				<h2>Select a Host</h2>
-				<p>{{ selected }}</p>
+				<p>{{ selected | stripcodes }}</p>
 				<div>
-					<select ui-select2="{ allowClear: true }" placeholder="Select
+					<select ui-select2="{ allowClear: true, format: formatResult,
+						formatResult: formatResult, formatSelection:
+						formatResult }" placeholder="Select
 						a Host" ng-model="selected">
 							<option>Select a Host</option>
-							<option ng-repeat="i in hosts" value="{{i.hname}}">{{i.hname | stripcodes}}</option>
+							<option ng-repeat="i in hosts"
+							value="{{i.hname}}">locked:{{ i.flags | passworded }} {{ i.hname | stripcodes }}</option>
 					</select>
 
 					<div class="btn-group">

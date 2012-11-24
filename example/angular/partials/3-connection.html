@@ -5,12 +5,14 @@
 		<tr>
 			<th>#</th>
 			<th>Licensed Name</th>
+			<th>Is Admin?</th>
 		</tr>
 	</thead>
-	<tbody ng-repeat="i in conns">
+	<tbody ng-repeat="i in sparse(conns)">
 		<tr>
-			<td>{{i.id}}</td>
-			<td>{{i.pname}}</td>
+			<td>{{ i.ucid }}</td>
+			<td>{{ i.pname | stripcodes }}</td>
+			<td>{{ i.admin }}</td>
 		</tr>
 	</tbody>
 </table>
