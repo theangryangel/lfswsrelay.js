@@ -16,10 +16,15 @@
 			.select2-container
 			{
 				min-width: 300px;
+				padding-top: 3.5px;
 				margin-right: 5px;
+				font-size: 14px;
+				font-weight: normal;
+				line-height: 20px;
 			}
 
-			body {
+			body
+			{
 				padding-top: 60px;
 				padding-bottom: 40px;
 			}
@@ -66,6 +71,11 @@
 			{
 				margin-bottom: 0;
 			}
+
+			.template-container h3
+			{
+				margin-top: 0;
+			}
 		</style>
 
 		<title>lfswsrelay.js :: an angular example</title>
@@ -77,7 +87,7 @@
 			<div class="navbar-inner">
 				<div class="container-fluid">
 					<div class="status-line" ng-controller="LytCtrl">
-						Status: {{ status }}
+						Status: {{ status | stripcodes }}
 					</div>
 
 					<a class="brand" href="/">lfswsrelay.js</a>
@@ -135,7 +145,30 @@
 			.factory('relay', function ($rootScope)
 			{
 				var relay = new lfswsrelay.client();
+
+				relay.selected = '';
+
+				relay.on('selected', function(selected) 
+				{
+					relay.selected = selected;
+				});
+
 				return relay;
+			})
+			.run(function($rootScope)
+			{
+				// monkey patch a safe apply function
+				$rootScope.$safe$apply = function(fn)
+				{
+					var phase = this.$root.$$phase;
+					if(phase == '$apply' || phase == '$digest')
+					{
+						if (fn)
+							fn();
+						return;
+					}
+					this.$apply(fn);
+				}
 			});
 
 			function LytCtrl($scope, relay)
@@ -144,25 +177,39 @@
 
 				relay.on('IR_ERR', function(data)
 				{
-
-					$scope.$apply(function()
+					$scope.$safe$apply(function()
 					{
 						$scope.status = 'Connected (Error)';
 					});
-					console.log(data);
 				});
 
 				relay.on('connected', function()
 				{
-					$scope.$apply(function()
+					$scope.$safe$apply(function()
 					{
 						$scope.status = 'Connected';
+
+						var payload = new lfswsrelay.packets.IR_HLR().pack();
+						relay.send(payload);
+					});
+				});
+
+				// selected is a custom event emitted by this application
+				// it is not part of lfswsrelay.js.
+				// you can emulate this by calling the following in your
+				// application:
+				//  relay.emit('selected', hostname);
+				relay.on('selected', function(data)
+				{
+					$scope.$safe$apply(function()
+					{
+						$scope.status = 'Connected ("' + data + '" selected)';
 					});
 				});
 
 				relay.on('disconnected', function()
 				{
-					$scope.$apply(function()
+					$scope.$safe$apply(function()
 					{
 						$scope.status = 'Disconnected';
 					});
@@ -179,25 +226,14 @@
 				}
 			}
 
-			function Step2Ctrl($scope, relay)
+			function Step2Ctrl($scope, $location, relay)
 			{
-				$scope.$safe$apply = function(fn)
-				{
-					var phase = this.$root.$$phase;
-					if(phase == '$apply' || phase == '$digest')
-					{
-						fn();
-						return;
-					}
-					this.$apply(fn);
-				}
-
 				$scope.hosts = [];
 				$scope.selected = '';
 
 				relay.on('IR_HOS', function(data)
 				{
-					$scope.$safe$apply( function()
+					$scope.$safe$apply(function()
 					{
 						for (var i in data.info)
 							$scope.hosts.push(data.info[i]);
@@ -223,7 +259,7 @@
 					if (!relay.isConnected())
 						return;
 
-					$scope.$safe$apply( function()
+					$scope.$safe$apply(function()
 					{
 						$scope.hosts = [];
 					});
@@ -241,19 +277,12 @@
 
 					for (var i in $scope.hosts)
 					{
-						console.log("%d - %s", i, $scope.hosts[i].hname);
-
 						if ($scope.hosts[i].hname != $scope.selected)
 							continue;
 
-						console.log('setting hname');
 						selected = $scope.hosts[i].hname;
-
-						console.log('breaking');
-						break;
 					}
 
-					console.log('sending log');
 					var pkt = new lfswsrelay.packets.IR_SEL();
 					pkt.hname = selected;
 
@@ -262,18 +291,55 @@
 						var payload = pkt.pack();
 						relay.send(payload);
 
-						console.log(new lfswsrelay.packets.IR_SEL(payload));
-						console.log(Uint8Array(payload));
+						relay.emit('selected', selected);
 					}
 					catch (e)
 					{
 						console.log(e);
 					}
+
+					$location.path('/3');
 				}
 			}
 
 			function Step3Ctrl($scope, relay)
 			{
+				// host info
+				$scope.host = {
+					name: relay.selected,
+					admin: false
+				};
+
+				// connection list
+				$scope.conns = [];
+
+				// players
+				$scope.plyrs = [];
+
+				$scope.template = 'partials/3-host.html';
+
+				relay.on('IR_ARP', function(pkt)
+				{
+					$scope.$safe$apply(function()
+					{
+						$scope.host.admin = pkt.admin;
+					});
+				});
+
+				// init - we've just connected, 
+				// InSim relay connected, and selected events won't fire here
+				// as this controller won't have been created when the events
+				// fire, so we're doing our init here instead of within events.
+				if (!relay.isConnected())
+					return;
+
+				// is admin?
+				var payload = new lfswsrelay.packets.IR_ARQ().pack();
+				relay.send(payload);
+
+				// send TINY_NCN to get connection list
+
+				// send TINY_NPL to get player list
 			}
 
 			function Step4Ctrl($scope, $location, relay)

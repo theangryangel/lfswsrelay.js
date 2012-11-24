@@ -2,7 +2,11 @@
 		<div class="hero-unit">
 			<div class="container-fluid">
 				<h2>Play with that Data</h2>
-				<p>asdasd</p>
+				<p>Now that you're connected, you're receiving packets, and you
+				can do whatever you can think of, with that data.</p>
+				<p>You can maintain a live list of players, you can draw a live
+				animated map.</p>
+				<p>The limit is your imagination.</p>
 			</div>
 		</div>
 
@@ -11,18 +15,17 @@
 				<div class="span3">
 					<div class="well sidebar-nav">
 						<ul class="nav nav-list">
-							<li class="nav-header">Host Information</li>
-							<li><a href="#">Host Information</a></li>
-							<li><a href="#">Connection List</a></li>
-							<li><a href="#">Player List</a></li>
-							<li class="nav-header">Debug Information</li>
-							<li><a href="#">Packets Received</a></li>
-							<li><a href="#">Send Packet</a></li>
+							<li class="nav-header">Example Info</li>
+							<li><a ng-click="template =	'partials/3-host.html'"><i class="icon icon-info-sign"></i> Host Information</a></li>
+							<li><a ng-click="template =	'partials/3-connection.html'"><i class="icon icon-th-list"></i> Connection List</a></li>
+							<li><a ng-click="template =	'partials/3-player.html'"><i class="icon icon-user"></i> Player List</a></li>
 						</ul>
 					</div>
 				</div>
 				<div class="span9">
-					span9
+					<div class="template-container" ng-include src="template">
+						
+					</div>
 				</div>
 			</div>
 		</div>
