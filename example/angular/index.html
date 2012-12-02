@@ -417,6 +417,20 @@
 					});
 				});
 
+				relay.on('IS_STA', function(pkt)
+				{
+					$scope.$safe$apply(function()
+					{
+						for (var i in pkt)
+						{
+							if (i.charAt(0) == '_')
+								continue;
+
+							$scope.host[i] = pkt[i];
+						}
+					});
+				});
+
 				relay.on('IS_LAP', function(pkt)
 				{
 					$scope.$safe$apply(function()
@@ -433,6 +447,8 @@
 						}
 					});
 				});
+
+				// TODO: Replace with state plugin, once complete
 
 				// init - we've just connected, 
 				// InSim relay connected, and selected events won't fire here
@@ -454,6 +470,12 @@
 				var npl = new lfswsrelay.packets.IS_TINY();
 				npl.subt = 14;
 				relay.send(npl.pack());
+
+				// send TINY_SST to get state
+				var sst = new lfswsrelay.packets.IS_TINY();
+				sst.reqi = 1;
+				sst.subt = 7;
+				relay.send(sst.pack());
 			}
 
 			function Step4Ctrl($scope, $location, relay)
