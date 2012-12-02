@@ -7,6 +7,9 @@
 			<th>Player Name</th>
 			<th>Vehicle</th>
 			<th>Skin Name</th>
+			<th>Lap #</th>
+			<th>Lap Time</th>
+			<th>Elapsed Time</th>
 		</tr>
 	</thead>
 	<tbody ng-repeat="i in sparse(plyrs)">
@@ -15,6 +18,9 @@
 			<td>{{i.pname | stripcodes}}</td>
 			<td>{{i.cname}}</td>
 			<td>{{i.sname}}</td>
+			<td>{{i.lapsdone}}</td>
+			<td>{{ i.ltime | msToHuman }}</td>
+			<td>{{ i.etime | msToHuman }}</td>
 		</tr>
 	</tbody>
 </table>

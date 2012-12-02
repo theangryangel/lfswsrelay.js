@@ -122,6 +122,13 @@
 		<script type="text/javascript" charset="utf-8" src="../../lib/insim.js"></script>
 
 		<script type="text/javascript" charset="utf-8">
+			function zeroPad(num, count)
+			{
+				var numZeropad = num + '';
+				while(numZeropad.length < count)
+					numZeropad = "0" + numZeropad;
+				return numZeropad;
+			}
 
 			var demo = angular.module('demo', [ 'ui' ])
 			.config(function($routeProvider)
@@ -140,6 +147,19 @@
 				return function (text)
 				{
 					return text.replace(/\^[0-9\^LGCJETBHSK]/g, '');
+				};
+			})
+			.filter('msToHuman', function()
+			{
+				return function(ms)
+				{
+					var seconds = ((ms / 1000) % 60),
+						minutes = (((ms / 1000) / 60) % 60),
+						hours = ((((ms / 1000) / 60) / 60) % 24);
+
+					return ((hours >= 1) ? zeroPad(Math.floor(hours), 2) + ':' : '') +
+						zeroPad(Math.floor(minutes), 2) + ':' +
+						zeroPad(seconds.toFixed(2), 5);
 				};
 			})
 			.filter('passworded', function ()
@@ -390,7 +410,24 @@
 				{
 					$scope.$safe$apply(function()
 					{
-						$scope.chat.push(pkt.msg);
+						$scope.chat.push((new Date).toISOString() + ' ' + pkt.msg);
+					});
+				});
+
+				relay.on('IS_LAP', function(pkt)
+				{
+					$scope.$safe$apply(function()
+					{
+						if (!$scope.plyrs[pkt.plid])
+							return;
+
+						for (var i in pkt)
+						{
+							if (i.charAt(0) == '_')
+								continue;
+
+							$scope.plyrs[pkt.plid][i] = pkt[i];
+						}
 					});
 				});
 
