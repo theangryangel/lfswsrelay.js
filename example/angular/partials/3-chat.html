@@ -1,20 +1,4 @@
-<h3>Players List</h3>
-
-<table class="table table-striped table-condensed">
-	<thead>
-		<tr>
-			<th>Player ID</th>
-			<th>Player Name</th>
-			<th>Vehicle</th>
-			<th>Skin Name</th>
-		</tr>
-	</thead>
-	<tbody ng-repeat="i in sparse(plyrs)">
-		<tr>
-			<td>{{i.plid}}</td>
-			<td>{{i.pname | stripcodes}}</td>
-			<td>{{i.cname}}</td>
-			<td>{{i.sname}}</td>
-		</tr>
-	</tbody>
-</table>
+<h3>Chat List</h3>
+<ul ng-repeat="i in chat">
+	<li>{{ i | stripcodes }}</li>
+</ul>

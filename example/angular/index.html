@@ -336,6 +336,9 @@
 				// players
 				$scope.plyrs = [];
 
+				// chat
+				$scope.chat = [];
+
 				$scope.template = 'partials/3-host.html';
 
 				$scope.sparse = function (input)
@@ -380,6 +383,14 @@
 					$scope.$safe$apply(function()
 					{
 						delete $scope.plyrs[pkt.plid];
+					});
+				});
+
+				relay.on('IS_MSO', function(pkt)
+				{
+					$scope.$safe$apply(function()
+					{
+						$scope.chat.push(pkt.msg);
 					});
 				});
 
