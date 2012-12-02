@@ -120,6 +120,7 @@
 		<script type="text/javascript" charset="utf-8" src="../../../jspack-arraybuffer/struct.js"></script>
 		<script type="text/javascript" charset="utf-8" src="../../lib/relay.js"></script>
 		<script type="text/javascript" charset="utf-8" src="../../lib/insim.js"></script>
+		<script type="text/javascript" charset="utf-8" src="../../lib/state.js"></script>
 
 		<script type="text/javascript" charset="utf-8">
 			function zeroPad(num, count)
@@ -172,6 +173,8 @@
 			.factory('relay', function ($rootScope)
 			{
 				var relay = new lfswsrelay.client();
+
+				relay.use(lfswsrelay.state);
 
 				relay.selected = '';
 
